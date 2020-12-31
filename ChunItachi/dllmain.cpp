@@ -377,7 +377,6 @@ DWORD WINAPI threadMain(LPVOID lpParam) {
 											{"body", 
 												{
 													{
-														{"noNotif", true},
 														{"score", songScore},
 														{"lamp", songLamp},
 														{"matchType", "title"},
@@ -402,6 +401,7 @@ DWORD WINAPI threadMain(LPVOID lpParam) {
 							{"importData", outData.dump()},
 							{"serviceLoc", "DIRECT-MANUAL"},
 							{"gameLoc", "chunithm"},
+							{"noNotif", true},
 						};
 						cout << "[ChunItachi] Sending Data" << endl;
 						cpr::Response r = cpr::Patch(cpr::Url{ "https://kamaitachi.xyz/dashboard/data/import" },

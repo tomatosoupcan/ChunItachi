@@ -377,7 +377,7 @@ DWORD WINAPI threadMain(LPVOID lpParam) {
 											{"body", 
 												{
 													{
-														{"noNotif", "true"},
+														{"noNotif", true},
 														{"score", songScore},
 														{"lamp", songLamp},
 														{"matchType", "title"},
@@ -621,7 +621,7 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 
 		//Additional debug information
 		if (debug) {
-			printf("[ChunItachi] ChunItachi v0.0.1 \n");
+			printf("[ChunItachi] ChunItachi v0.1.0 \n");
 			printf("[ChunItachi] Base Address: %x\n", baseAddress);
 			printf("[ChunItachi] Boost Address: %x\n", boostAddress);
 			printf("[ChunItachi] Boost Address2: %x\n", boostAddress2);

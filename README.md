@@ -1,6 +1,6 @@
 # ChunItachi
 
-ChunItachi is an injectable dll for Chunithm Amazon which enables KamaItachi uploads
+ChunItachi is an injectable dll for Chunithm Amazon/AmazonPlus/Crystal which enables KamaItachi uploads as you play
 
 ## Installation & Usage
 
@@ -12,7 +12,9 @@ Modify your start.bat to mirror:
 inject -d -k chunihook.dll -k ChunItachi.dll chuniApp.exe
 ```
 
-Place ChunItachi.dll in your app/bin directory.
+Place ChunItachi.dll, zlib1.dll, libcurl.dll, and ChunItachi.ini  in your bin directory.
+
+You need an option folder defined in segatools.ini
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.

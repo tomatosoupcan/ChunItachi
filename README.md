@@ -1,6 +1,6 @@
 # ChunItachi
 
-ChunItachi is an injectable dll for Chunithm Amazon/AmazonPlus/Crystal which enables KamaItachi uploads as you play
+ChunItachi is an injectable dll for Chunithm Amazon/AmazonPlus/Crystal which enables [KamaItachi](https://kamaitachi.xyz) uploads as you play
 
 ## Installation & Usage
 

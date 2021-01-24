@@ -236,6 +236,7 @@ DWORD WINAPI threadMain(LPVOID lpParam) {
 	string songName;
 	string dif2String;
 	string genreID;
+	string releaseTag;
 	//check Kamai connection
 	cpr::Response rk = cpr::Get(cpr::Url{ "https://api.kamaitachi.xyz/v1" });
 	cout << "[ChunItachi] Checking connection to Kamaitachi, response code: " << rk.status_code << endl;
@@ -302,6 +303,12 @@ DWORD WINAPI threadMain(LPVOID lpParam) {
 			genreID.erase(genreID.find_last_not_of(" \n\r\t") + 1);
 			stringBuf.str("");
 			stringBuf.clear();
+			//Get release tag
+			stringBuf << root_node->first_node("releaseTagName")->first_node("str")->value() << endl;
+			releaseTag = stringBuf.str();
+			releaseTag.erase(releaseTag.find_last_not_of(" \n\r\t") + 1);
+			stringBuf.str("");
+			stringBuf.clear();
 			//Get Song Level
 			switch (curDiff) {
 			case 0:
@@ -342,8 +349,9 @@ DWORD WINAPI threadMain(LPVOID lpParam) {
 			//give the game a second or two to think, this should also help avoid accidental sends when returning
 			//to test menu after I fix that shit
 			Sleep(2000);
+			releaseTag = releaseTag.substr(3,10);
 			//Verify we are sending data from a real genre category, avoid customs, verify the user is the user defined in the config
-			if (extid == extidload and testmenu == 0) {
+			if (extid == extidload and testmenu == 0 and (releaseTag == "1.00.00" or releaseTag == "1.05.00" or releaseTag == "1.10.00" or releaseTag == "1.15.00" or releaseTag == "1.20.00" or releaseTag == "1.25.00" or releaseTag == "1.35.00" or releaseTag == "1.40.00")) {
 				if (genreID == "0" or genreID == "99" or genreID == "2" or genreID == "3" or genreID == "6" or genreID == "1" or genreID == "7" or genreID == "8" or genreID == "9" or genreID == "5" or genreID == "10") {
 					if (dif2String != "WORLD'S END" and dif2String != "TUTORIAL" and dif2String != "ERROR") {
 						//calculate lamp

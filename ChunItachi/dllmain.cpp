@@ -231,7 +231,7 @@ DWORD WINAPI threadMain(LPVOID lpParam) {
 	int songCrit = 0;
 	int songScore = 0;
 	int songBars = 0;
-	string songLamp;
+	string songLamp = "FAILED";
 	//initialize strings used in setting status
 	string songName;
 	string dif2String;
@@ -362,10 +362,10 @@ DWORD WINAPI threadMain(LPVOID lpParam) {
 							songLamp = "ALL JUSTICE CRITICAL";
 						}
 						else if (songMiss == 0 and songAttack == 0) {
-							songLamp == "ALL JUSTICE";
+							songLamp = "ALL JUSTICE";
 						}
 						else if (songMiss == 0) {
-							songLamp == "FULL COMBO";
+							songLamp = "FULL COMBO";
 						}
 						else {
 							songLamp = "CLEAR";
@@ -417,6 +417,7 @@ DWORD WINAPI threadMain(LPVOID lpParam) {
 							cpr::Header{ {"Authorization","Bearer " + apikey}, {"Content-Type", "application/json"} },
 							cpr::Body{ jsonBody.dump() });
 						cout << jsonBody.dump() << endl;
+						
 						cout << "[ChunItachi] Sent, response code: " << r.status_code << endl;
 						cout << "[ChunItachi] Response text: " << r.text << endl;
 						//cout << r.text << endl;

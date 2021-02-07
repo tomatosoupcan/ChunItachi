@@ -19,6 +19,7 @@ Config file info, everything else should mostly remain untouched:
 - game, set this to any of amazon, amazonplus, or crystal
 - username, set this to your kamai username
 - password, set this to your kamai password
+- failOverLamp, set this to false if you would prefer your lamps to take precedent over the FAILED lamp, set this to true if you want FAILED to take precedent
 
 You need an option folder defined in segatools.ini
 

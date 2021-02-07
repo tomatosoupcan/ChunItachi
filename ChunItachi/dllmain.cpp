@@ -32,6 +32,7 @@ string apikey = "";
 string kamaUser = "";
 string kamaPass = "";
 string apitimeout = "";
+bool failOverLamp = true;
 
 //initialize search directories vector
 vector<std::string> finalSearchDirs;
@@ -355,7 +356,7 @@ DWORD WINAPI threadMain(LPVOID lpParam) {
 				if (genreID == "0" or genreID == "99" or genreID == "2" or genreID == "3" or genreID == "6" or genreID == "1" or genreID == "7" or genreID == "8" or genreID == "9" or genreID == "5" or genreID == "10") {
 					if (dif2String != "WORLD'S END" and dif2String != "TUTORIAL" and dif2String != "ERROR") {
 						//calculate lamp
-						if (songBars < targetBars/100) {
+						if (songBars < targetBars/100 and failOverLamp) {
 							songLamp = "FAILED";
 						}
 						else if (songMiss == 0 and songAttack == 0 and songJustice == 0) {
@@ -366,6 +367,9 @@ DWORD WINAPI threadMain(LPVOID lpParam) {
 						}
 						else if (songMiss == 0) {
 							songLamp = "FULL COMBO";
+						}
+						else if (songBars < targetBars / 100) {
+							songLamp = "FAILED";
 						}
 						else {
 							songLamp = "CLEAR";
@@ -494,6 +498,7 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 		}
 		//load up ini settings
 		debug = GetBooleanValue((char*)"showDebug");
+		failOverLamp = GetBooleanValue((char*)"failOverLamp");
 
 		//get the directories that contain AXXX folders, then find paths to AXXX folders and put them in a vector
 		char startDirChar[MAX_PATH];

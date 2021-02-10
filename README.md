@@ -6,6 +6,8 @@ ChunItachi is an injectable dll for Chunithm Amazon/AmazonPlus/Crystal which ena
 
 Make sure you have [Microsoft VC++ Runtimes](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads) installed.
 
+Make sure you have your segatools.ini configured correctly and have an options folder, I think that still crashes things, maybe I'll fix it someday.
+
 Modify your start.bat to mirror:
 
 ```bash

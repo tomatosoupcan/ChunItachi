@@ -239,10 +239,10 @@ DWORD WINAPI threadMain(LPVOID lpParam) {
 	string genreID;
 	string releaseTag;
 	//check Kamai connection
-	cpr::Response rk = cpr::Get(cpr::Url{ "https://api.kamaitachi.xyz/v1" });
+	/*cpr::Response rk = cpr::Get(cpr::Url{"https://api.kamaitachi.xyz/v1"});
 	cout << "[ChunItachi] Checking connection to Kamaitachi, response code: " << rk.status_code << endl;
 	//get API key here
-	checkAPI();
+	checkAPI();*/
 	
 	while (true) {
 		//Run every 1 second
@@ -352,7 +352,7 @@ DWORD WINAPI threadMain(LPVOID lpParam) {
 			Sleep(2000);
 			releaseTag = releaseTag.substr(3,10);
 			//Verify we are sending data from a real genre category, avoid customs, verify the user is the user defined in the config
-			if (extid == extidload and testmenu == 0 and (releaseTag == "1.00.00" or releaseTag == "1.05.00" or releaseTag == "1.10.00" or releaseTag == "1.15.00" or releaseTag == "1.20.00" or releaseTag == "1.25.00" or releaseTag == "1.35.00" or releaseTag == "1.40.00" or releaseTag == "1.45.00" or releaseTag == "1.50.00")) {
+			if ((extid == extidload or extidload == 0 or extid == 0) and testmenu == 0 and (releaseTag == "1.00.00" or releaseTag == "1.05.00" or releaseTag == "1.10.00" or releaseTag == "1.15.00" or releaseTag == "1.20.00" or releaseTag == "1.25.00" or releaseTag == "1.35.00" or releaseTag == "1.40.00" or releaseTag == "1.45.00" or releaseTag == "1.50.00" or releaseTag == "1.55.00")) {
 				if (genreID == "0" or genreID == "99" or genreID == "2" or genreID == "3" or genreID == "6" or genreID == "1" or genreID == "7" or genreID == "8" or genreID == "9" or genreID == "5" or genreID == "10") {
 					if (dif2String != "WORLD'S END" and dif2String != "TUTORIAL" and dif2String != "ERROR") {
 						//calculate lamp
@@ -426,6 +426,7 @@ DWORD WINAPI threadMain(LPVOID lpParam) {
 						cout << "[ChunItachi] Response text: " << r.text << endl;
 						//cout << r.text << endl;
 						
+						
 					}
 					else {
 						cout << "[ChunItachi] Not a valid diff: " << dif2String << "\n";
@@ -436,7 +437,8 @@ DWORD WINAPI threadMain(LPVOID lpParam) {
 				}
 			}
 			else {
-				cout << "[ChunItachi] Non matching extid: " << extid << " versus " << extidload << "\n";
+				cout << "[ChunItachi] Non matching extid: " << extid << " versus " << extidload << "?\n";
+				cout << "[ChunItachi] Test menu flag: " << testmenu << " Release Tag: " << releaseTag << "?\n";
 			}
 		}
 
@@ -574,6 +576,22 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 			testmenuAddress2 = boostAddress2 + 0x143338;
 			clearBarsAddress = boostAddress + 0x11C335;
 		}
+		else if (gameversion == "paradise" or gameversion == "paradiselost") {
+			baseAddress = (intptr_t)chun + 0xC00;
+			boostAddress = (intptr_t)chun + 0x0;
+			boostAddress2 = (intptr_t)chun + 0x0;
+			opSongAddress = boostAddress + 0x72B098;
+			opDiffAddress = boostAddress + 0x63D06A;
+			opInSongAddress = boostAddress + 0x74F2AF;
+			opInSongAddress2 = boostAddress + 0x74F2B8;
+			bullshitAddress = boostAddress + 0x5D6CD3;
+			extidAddress = (intptr_t)chun + 0x3C62F4;
+			clearingAddress = boostAddress + 0x6B004D;
+			clearingAddress2 = boostAddress + 0x6AE81A;
+			testmenuAddress = boostAddress2 + 0x96B94B;
+			testmenuAddress2 = boostAddress2 + 0x968658;
+			clearBarsAddress = boostAddress + 0x5D7C65;
+		}
 		else {
 			cout << "[ChunItachi] Game version is unsupported, compatability needs to be added, currently supports [amazon,amazonplus,crystal]" << endl;
 			system("pause");
@@ -615,7 +633,7 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 		jmpBackAddy10 = testmenuAddress2 + 6;
 		HOOK((void*)testmenuAddress2, testmenuDetour2, 6);
 		//detour clearbars
-		if (gameversion == "crystal") {
+		if (gameversion == "crystal" or gameversion == "paradise" or gameversion == "paradiselost") {
 			if (debug) { printf("[ChunItachi] Detouring clearBars\n"); }
 			jmpBackAddy12 = clearBarsAddress + 6;
 			HOOK((void*)clearBarsAddress, clearBarsDetour2, 6);

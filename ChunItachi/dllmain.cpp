@@ -29,9 +29,6 @@ bool debug = true;
 string gameversion = "";
 string targeturl = "";
 string apikey = "";
-string kamaUser = "";
-string kamaPass = "";
-string apitimeout = "";
 bool failOverLamp = true;
 
 //initialize search directories vector
@@ -64,34 +61,6 @@ BOOL HOOK(void * toHook, void * ourFunct, int len) {
 
 	//return
 	return true;
-}
-
-VOID checkAPI() {
-	if (apitimeout == "") { apitimeout = "0"; }
-	if (apikey == "" or stod(apitimeout) < duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count())
-	{
-		cout << "[ChunItachi] Getting apikey" << endl;
-		json authdata = {
-			{"username", kamaUser},
-			{"password", kamaPass}
-		};
-		cpr::Response rk = cpr::Post(cpr::Url{ "https://kamaitachi.xyz/internal-api/auth/login" },
-			cpr::Timeout(4 * 1000),
-			cpr::Header{ {"Content-Type", "application/json"} },
-			cpr::Body{ authdata.dump() });
-		cout << rk.text << endl;
-		Sleep(1000);
-		json returnData = json::parse(rk.text);
-		apikey = returnData["body"]["apikey"];
-		apitimeout = to_string(returnData["body"]["expiryTime"]);
-		CSimpleIniA ini;
-		ini.LoadFile(".\\ChunItachi.ini");
-		ini.SetValue("general", "apikey", apikey.c_str());
-		ini.SetValue("general", "apitimeout", apitimeout.c_str());
-	}
-	else {
-		cout << "[ChunItachi] Using stored apikey\n";
-	}
 }
 
 //set jump back addresses before use, create detours, 1 address for each detour to avoid issues
@@ -377,7 +346,6 @@ DWORD WINAPI threadMain(LPVOID lpParam) {
 						//pull the values
 						printf("[ChunItachi] Uploading play to KamaItachi:\n");
 						//actually send the data here
-						checkAPI();
 						
 						json outData = {
 											{"head", 
@@ -494,10 +462,6 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 
 	if (ul_reason_for_call == DLL_PROCESS_ATTACH)
 	{
-		if (debug) {
-			AllocConsole();
-			freopen("CONOUT$", "w", stdout);
-		}
 		//load up ini settings
 		debug = GetBooleanValue((char*)"showDebug");
 		failOverLamp = GetBooleanValue((char*)"failOverLamp");
@@ -523,9 +487,11 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 		cout << "[ChunItachi] Read extID from config: " << extidload << "\n";
 		gameversion = ini.GetValue("general", "game");
 		apikey = ini.GetValue("general", "apikey");
-		kamaUser = ini.GetValue("general", "username");
-		kamaPass = ini.GetValue("general", "password");
-		apitimeout = ini.GetValue("general", "apitimeout");
+
+		if (debug) {
+			AllocConsole();
+			freopen("CONOUT$", "w", stdout);
+		}
 
 		//set up for felxibility later on
 		if (gameversion == "amazon") {

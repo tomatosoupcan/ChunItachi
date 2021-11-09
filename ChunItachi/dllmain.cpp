@@ -208,10 +208,8 @@ DWORD WINAPI threadMain(LPVOID lpParam) {
 	string genreID;
 	string releaseTag;
 	//check Kamai connection
-	/*cpr::Response rk = cpr::Get(cpr::Url{"https://api.kamaitachi.xyz/v1"});
+	cpr::Response rk = cpr::Get(cpr::Url{"https://staging.kamaitachi.xyz/api/v1/status"});
 	cout << "[ChunItachi] Checking connection to Kamaitachi, response code: " << rk.status_code << endl;
-	//get API key here
-	checkAPI();*/
 	
 	while (true) {
 		//Run every 1 second
@@ -348,13 +346,13 @@ DWORD WINAPI threadMain(LPVOID lpParam) {
 						//actually send the data here
 						
 						json outData = {
-											{"head", 
+											{"meta", 
 												{
 													{"service", "chunitachi"},
 													{"game", "chunithm"}
 												}
 											},
-											{"body", 
+											{"scores", 
 												{
 													{
 														{"score", songScore},
@@ -384,7 +382,7 @@ DWORD WINAPI threadMain(LPVOID lpParam) {
 							{"noNotif", true},
 						};
 						cout << "[ChunItachi] Sending Data" << endl;
-						cpr::Response r = cpr::Patch(cpr::Url{ "https://kamaitachi.xyz/dashboard/data/import" },
+						cpr::Response r = cpr::Patch(cpr::Url{ "https://staging.kamaitachi.xyz/ir/chunitachi/import" },
 							cpr::Timeout(4 * 1000),
 							cpr::Header{ {"Authorization","Bearer " + apikey}, {"Content-Type", "application/json"} },
 							cpr::Body{ jsonBody.dump() });

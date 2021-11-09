@@ -351,7 +351,8 @@ DWORD WINAPI threadMain(LPVOID lpParam) {
 											{"meta", 
 												{
 													{"service", "ChunItachi"},
-													{"game", "chunithm"}
+													{"game", "chunithm"},
+													{"playtype", "Single"}
 												}
 											},
 											{"scores", 
@@ -359,9 +360,8 @@ DWORD WINAPI threadMain(LPVOID lpParam) {
 													{
 														{"score", songScore},
 														{"lamp", songLamp},
-														{"matchType", "title"},
+														{"matchType", "songTitle"},
 														{"identifier", songName},
-														{"playtype", "Single"},
 														{"difficulty", dif2String},
 														{"timeAchieved", duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count()},
 														{"judgements",

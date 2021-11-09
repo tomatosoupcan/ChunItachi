@@ -29,6 +29,8 @@ bool debug = true;
 string gameversion = "";
 string targeturl = "";
 string apikey = "";
+string apiEndpoint = "";
+string apiStatus = "";
 bool failOverLamp = true;
 
 //initialize search directories vector
@@ -208,7 +210,7 @@ DWORD WINAPI threadMain(LPVOID lpParam) {
 	string genreID;
 	string releaseTag;
 	//check Kamai connection
-	cpr::Response rk = cpr::Get(cpr::Url{"https://staging.kamaitachi.xyz/api/v1/status"});
+	cpr::Response rk = cpr::Get(cpr::Url{ apiStatus });
 	cout << "[ChunItachi] Checking connection to Kamaitachi, response code: " << rk.status_code << endl;
 	
 	while (true) {
@@ -348,7 +350,7 @@ DWORD WINAPI threadMain(LPVOID lpParam) {
 						json outData = {
 											{"meta", 
 												{
-													{"service", "chunitachi"},
+													{"service", "ChunItachi"},
 													{"game", "chunithm"}
 												}
 											},
@@ -362,7 +364,7 @@ DWORD WINAPI threadMain(LPVOID lpParam) {
 														{"playtype", "Single"},
 														{"difficulty", dif2String},
 														{"timeAchieved", duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count()},
-														{"hitData",
+														{"judgements",
 															{
 																{"miss",songMiss},
 																{"attack",songAttack},
@@ -382,7 +384,7 @@ DWORD WINAPI threadMain(LPVOID lpParam) {
 							{"noNotif", true},
 						};
 						cout << "[ChunItachi] Sending Data" << endl;
-						cpr::Response r = cpr::Patch(cpr::Url{ "https://staging.kamaitachi.xyz/ir/chunitachi/import" },
+						cpr::Response r = cpr::Post(cpr::Url{ apiEndpoint },
 							cpr::Timeout(4 * 1000),
 							cpr::Header{ {"Authorization","Bearer " + apikey}, {"Content-Type", "application/json"} },
 							cpr::Body{ jsonBody.dump() });
@@ -484,7 +486,9 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 		extidload = stoi(ini.GetValue("general", "extID"));
 		cout << "[ChunItachi] Read extID from config: " << extidload << "\n";
 		gameversion = ini.GetValue("general", "game");
-		apikey = ini.GetValue("general", "apikey");
+		apikey = ini.GetValue("kamaitachi", "apikey");
+		apiEndpoint = ini.GetValue("kamaitachi", "apiEndpoint");
+		apiStatus = ini.GetValue("kamaitachi", "apiStatus");
 
 		if (debug) {
 			AllocConsole();

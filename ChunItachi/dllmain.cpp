@@ -377,18 +377,19 @@ DWORD WINAPI threadMain(LPVOID lpParam) {
 											}
 										};
 						//curl out
-						json jsonBody = {
+						/*json jsonBody = {
 							{"importData", outData.dump()},
 							{"serviceLoc", "DIRECT-MANUAL"},
 							{"gameLoc", "chunithm"},
 							{"noNotif", true},
-						};
+						};*/
 						cout << "[ChunItachi] Sending Data" << endl;
 						cpr::Response r = cpr::Post(cpr::Url{ apiEndpoint },
 							cpr::Timeout(4 * 1000),
 							cpr::Header{ {"Authorization","Bearer " + apikey}, {"Content-Type", "application/json"} },
-							cpr::Body{ jsonBody.dump() });
-						cout << jsonBody.dump() << endl;
+							//cpr::Body{ jsonBody.dump() });
+							cpr::Body{ outData.dump() });
+						cout << outData.dump() << endl;
 						
 						cout << "[ChunItachi] Sent, response code: " << r.status_code << endl;
 						cout << "[ChunItachi] Response text: " << r.text << endl;

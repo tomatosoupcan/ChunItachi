@@ -352,7 +352,8 @@ DWORD WINAPI threadMain(LPVOID lpParam) {
 												{
 													{"service", "ChunItachi"},
 													{"game", "chunithm"},
-													{"playtype", "Single"}
+													{"playtype", "Single"},
+													{"version", gameversion}
 												}
 											},
 											{"scores", 

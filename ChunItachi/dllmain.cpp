@@ -29,9 +29,8 @@ bool debug = true;
 string gameversion = "";
 string targeturl = "";
 string apikey = "";
-string kamaUser = "";
-string kamaPass = "";
-string apitimeout = "";
+string apiEndpoint = "";
+string apiStatus = "";
 bool failOverLamp = true;
 
 //initialize search directories vector
@@ -64,34 +63,6 @@ BOOL HOOK(void * toHook, void * ourFunct, int len) {
 
 	//return
 	return true;
-}
-
-VOID checkAPI() {
-	if (apitimeout == "") { apitimeout = "0"; }
-	if (apikey == "" or stod(apitimeout) < duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count())
-	{
-		cout << "[ChunItachi] Getting apikey" << endl;
-		json authdata = {
-			{"username", kamaUser},
-			{"password", kamaPass}
-		};
-		cpr::Response rk = cpr::Post(cpr::Url{ "https://kamaitachi.xyz/internal-api/auth/login" },
-			cpr::Timeout(4 * 1000),
-			cpr::Header{ {"Content-Type", "application/json"} },
-			cpr::Body{ authdata.dump() });
-		cout << rk.text << endl;
-		Sleep(1000);
-		json returnData = json::parse(rk.text);
-		apikey = returnData["body"]["apikey"];
-		apitimeout = to_string(returnData["body"]["expiryTime"]);
-		CSimpleIniA ini;
-		ini.LoadFile(".\\ChunItachi.ini");
-		ini.SetValue("general", "apikey", apikey.c_str());
-		ini.SetValue("general", "apitimeout", apitimeout.c_str());
-	}
-	else {
-		cout << "[ChunItachi] Using stored apikey\n";
-	}
 }
 
 //set jump back addresses before use, create detours, 1 address for each detour to avoid issues
@@ -239,10 +210,8 @@ DWORD WINAPI threadMain(LPVOID lpParam) {
 	string genreID;
 	string releaseTag;
 	//check Kamai connection
-	cpr::Response rk = cpr::Get(cpr::Url{ "https://api.kamaitachi.xyz/v1" });
+	cpr::Response rk = cpr::Get(cpr::Url{ apiStatus });
 	cout << "[ChunItachi] Checking connection to Kamaitachi, response code: " << rk.status_code << endl;
-	//get API key here
-	checkAPI();
 	
 	while (true) {
 		//Run every 1 second
@@ -352,7 +321,7 @@ DWORD WINAPI threadMain(LPVOID lpParam) {
 			Sleep(2000);
 			releaseTag = releaseTag.substr(3,10);
 			//Verify we are sending data from a real genre category, avoid customs, verify the user is the user defined in the config
-			if (extid == extidload and testmenu == 0 and (releaseTag == "1.00.00" or releaseTag == "1.05.00" or releaseTag == "1.10.00" or releaseTag == "1.15.00" or releaseTag == "1.20.00" or releaseTag == "1.25.00" or releaseTag == "1.35.00" or releaseTag == "1.40.00")) {
+			if ((extid == extidload or extidload == 0 or extid == 0) and testmenu == 0 and (releaseTag == "1.00.00" or releaseTag == "1.05.00" or releaseTag == "1.10.00" or releaseTag == "1.15.00" or releaseTag == "1.20.00" or releaseTag == "1.25.00" or releaseTag == "1.35.00" or releaseTag == "1.40.00" or releaseTag == "1.45.00" or releaseTag == "1.50.00" or releaseTag == "1.55.00")) {
 				if (genreID == "0" or genreID == "99" or genreID == "2" or genreID == "3" or genreID == "6" or genreID == "1" or genreID == "7" or genreID == "8" or genreID == "9" or genreID == "5" or genreID == "10") {
 					if (dif2String != "WORLD'S END" and dif2String != "TUTORIAL" and dif2String != "ERROR") {
 						//calculate lamp
@@ -377,26 +346,26 @@ DWORD WINAPI threadMain(LPVOID lpParam) {
 						//pull the values
 						printf("[ChunItachi] Uploading play to KamaItachi:\n");
 						//actually send the data here
-						checkAPI();
 						
 						json outData = {
-											{"head", 
+											{"meta", 
 												{
-													{"service", "chunitachi"},
-													{"game", "chunithm"}
+													{"service", "ChunItachi"},
+													{"game", "chunithm"},
+													{"playtype", "Single"},
+													{"version", gameversion}
 												}
 											},
-											{"body", 
+											{"scores", 
 												{
 													{
 														{"score", songScore},
 														{"lamp", songLamp},
-														{"matchType", "title"},
+														{"matchType", "songTitle"},
 														{"identifier", songName},
-														{"playtype", "Single"},
 														{"difficulty", dif2String},
 														{"timeAchieved", duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count()},
-														{"hitData",
+														{"judgements",
 															{
 																{"miss",songMiss},
 																{"attack",songAttack},
@@ -409,22 +378,24 @@ DWORD WINAPI threadMain(LPVOID lpParam) {
 											}
 										};
 						//curl out
-						json jsonBody = {
+						/*json jsonBody = {
 							{"importData", outData.dump()},
 							{"serviceLoc", "DIRECT-MANUAL"},
 							{"gameLoc", "chunithm"},
 							{"noNotif", true},
-						};
+						};*/
 						cout << "[ChunItachi] Sending Data" << endl;
-						cpr::Response r = cpr::Patch(cpr::Url{ "https://kamaitachi.xyz/dashboard/data/import" },
+						cpr::Response r = cpr::Post(cpr::Url{ apiEndpoint },
 							cpr::Timeout(4 * 1000),
 							cpr::Header{ {"Authorization","Bearer " + apikey}, {"Content-Type", "application/json"} },
-							cpr::Body{ jsonBody.dump() });
-						cout << jsonBody.dump() << endl;
+							//cpr::Body{ jsonBody.dump() });
+							cpr::Body{ outData.dump() });
+						cout << outData.dump() << endl;
 						
 						cout << "[ChunItachi] Sent, response code: " << r.status_code << endl;
 						cout << "[ChunItachi] Response text: " << r.text << endl;
 						//cout << r.text << endl;
+						
 						
 					}
 					else {
@@ -436,7 +407,8 @@ DWORD WINAPI threadMain(LPVOID lpParam) {
 				}
 			}
 			else {
-				cout << "[ChunItachi] Non matching extid: " << extid << " versus " << extidload << "\n";
+				cout << "[ChunItachi] Non matching extid: " << extid << " versus " << extidload << "?\n";
+				cout << "[ChunItachi] Test menu flag: " << testmenu << " Release Tag: " << releaseTag << "?\n";
 			}
 		}
 
@@ -492,10 +464,6 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 
 	if (ul_reason_for_call == DLL_PROCESS_ATTACH)
 	{
-		if (debug) {
-			AllocConsole();
-			freopen("CONOUT$", "w", stdout);
-		}
 		//load up ini settings
 		debug = GetBooleanValue((char*)"showDebug");
 		failOverLamp = GetBooleanValue((char*)"failOverLamp");
@@ -520,10 +488,14 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 		extidload = stoi(ini.GetValue("general", "extID"));
 		cout << "[ChunItachi] Read extID from config: " << extidload << "\n";
 		gameversion = ini.GetValue("general", "game");
-		apikey = ini.GetValue("general", "apikey");
-		kamaUser = ini.GetValue("general", "username");
-		kamaPass = ini.GetValue("general", "password");
-		apitimeout = ini.GetValue("general", "apitimeout");
+		apikey = ini.GetValue("kamaitachi", "apikey");
+		apiEndpoint = ini.GetValue("kamaitachi", "apiEndpoint");
+		apiStatus = ini.GetValue("kamaitachi", "apiStatus");
+
+		if (debug) {
+			AllocConsole();
+			freopen("CONOUT$", "w", stdout);
+		}
 
 		//set up for felxibility later on
 		if (gameversion == "amazon") {
@@ -574,6 +546,22 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 			testmenuAddress2 = boostAddress2 + 0x143338;
 			clearBarsAddress = boostAddress + 0x11C335;
 		}
+		else if (gameversion == "paradise" or gameversion == "paradiselost") {
+			baseAddress = (intptr_t)chun + 0xC00;
+			boostAddress = (intptr_t)chun + 0x0;
+			boostAddress2 = (intptr_t)chun + 0x0;
+			opSongAddress = boostAddress + 0x72B098;
+			opDiffAddress = boostAddress + 0x63D06A;
+			opInSongAddress = boostAddress + 0x74F2AF;
+			opInSongAddress2 = boostAddress + 0x74F2B8;
+			bullshitAddress = boostAddress + 0x5D6CD3;
+			extidAddress = (intptr_t)chun + 0x3C62F4;
+			clearingAddress = boostAddress + 0x6B004D;
+			clearingAddress2 = boostAddress + 0x6AE81A;
+			testmenuAddress = boostAddress2 + 0x96B94B;
+			testmenuAddress2 = boostAddress2 + 0x968658;
+			clearBarsAddress = boostAddress + 0x5D7C65;
+		}
 		else {
 			cout << "[ChunItachi] Game version is unsupported, compatability needs to be added, currently supports [amazon,amazonplus,crystal]" << endl;
 			system("pause");
@@ -615,7 +603,7 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 		jmpBackAddy10 = testmenuAddress2 + 6;
 		HOOK((void*)testmenuAddress2, testmenuDetour2, 6);
 		//detour clearbars
-		if (gameversion == "crystal") {
+		if (gameversion == "crystal" or gameversion == "paradise" or gameversion == "paradiselost") {
 			if (debug) { printf("[ChunItachi] Detouring clearBars\n"); }
 			jmpBackAddy12 = clearBarsAddress + 6;
 			HOOK((void*)clearBarsAddress, clearBarsDetour2, 6);

@@ -1,6 +1,6 @@
 # ChunItachi
 
-ChunItachi is an injectable dll for Chunithm Amazon/AmazonPlus/Crystal which enables [KamaItachi](https://kamaitachi.xyz) uploads as you play
+ChunItachi is an injectable dll for Chunithm Amazon/AmazonPlus/Crystal/Paradise/ParadiseLost which enables [KamaItachi](https://kamaitachi.xyz) uploads as you play
 
 ## Installation & Usage
 
@@ -14,14 +14,16 @@ Modify your start.bat to mirror:
 inject -d -k chunihook.dll -k ChunItachi.dll chuniApp.exe
 ```
 
-Place ChunItachi.dll, zlib1.dll, libcurl.dll, and ChunItachi.ini  in your bin directory.
+Acquire an api key [here](https://staging.kamaitachi.xyz/client-file-flow/CIb553cbe17484e0ee6b14d12c51b9c7d2792ff866) and configure the generated ChunItachi.ini to your needs.
 
 Config file info, everything else should mostly remain untouched:
-- extid, set this to your extid for the account you want to register scores with, you can find this in your db (sega_card table in Aqua, aime_player in Minime). If you can't find it, or are unable to access your db, set this to some junk value like 123, then play a single song and check the debug logs for the mismatch info.
-- game, set this to any of amazon, amazonplus, or crystal
-- username, set this to your kamai username
-- password, set this to your kamai password
+- showDebug, set this to false to hide debug information, by default it's on to force you to notice the game needs to be set in the config file, but I'd recommend turning it off afterwards'
+- extid, set this to your extid for the account you want to register scores with, you can find this in your db (sega_card table in Aqua, aime_player in Minime). If you can't find it, or are unable to access your db, set this to some junk value like 123, then play a single song and check the debug logs for the mismatch info. (This can now be set to 0 to bypass this requirement)
+- game, set this to any of amazon, amazonplus, crystal, paradise, or paradiselost
+- apikey, this should be set automatically for you
 - failOverLamp, set this to false if you would prefer your lamps to take precedent over the FAILED lamp, set this to true if you want FAILED to take precedent
+
+Place ChunItachi.dll, zlib1.dll, libcurl.dll, and ChunItachi.ini  in your bin directory.
 
 You need an option folder defined in segatools.ini
 

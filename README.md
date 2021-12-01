@@ -14,7 +14,7 @@ Modify your start.bat to mirror:
 inject -d -k chunihook.dll -k ChunItachi.dll chuniApp.exe
 ```
 
-Acquire a generated ChunItachi.ini from Kamaitachi, and modify it to your needs.
+Acquire a generated ChunItachi.ini from [Kamaitachi here](https://kamaitachi.xyz/dashboard/import/chunitachi), and modify it to your needs.
 
 Config file info, everything else should mostly remain untouched:
 - showDebug, set this to false to hide debug information, by default it's on to force you to notice the game needs to be set in the config file, but I'd recommend turning it off afterwards'

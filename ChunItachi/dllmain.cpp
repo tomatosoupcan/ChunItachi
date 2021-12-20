@@ -185,6 +185,15 @@ void _declspec(naked) clearBarsDetour2() {
 		jmp[jmpBackAddy12]
 	}
 }
+//handle course difficulty, even though it's I think only master charts
+DWORD jmpBackAddy13;
+void _declspec(naked) diffDetour2() {
+	_asm {
+		mov[ebp + 0x000002EC], dl
+		mov[addDifficulty], edx
+		jmp[jmpBackAddy13]
+	}
+}
 
 #pragma warning( disable : 6262 ) //disable compiler warning regarding memory usage
 //spawn thread after startup to avoid locking application
@@ -450,6 +459,7 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 	intptr_t boostAddress2;
 	intptr_t opSongAddress;
 	intptr_t opDiffAddress;
+	intptr_t opDiffAddress2;
 	intptr_t opInSongAddress;
 	intptr_t opInSongAddress2;
 	intptr_t bullshitAddress;
@@ -498,60 +508,13 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 		}
 
 		//set up for felxibility later on
-		if (gameversion == "amazon") {
-			baseAddress = (intptr_t)chun + 0xC00;
-			boostAddress = (intptr_t)chun + 0x467100;
-			boostAddress2 = (intptr_t)chun + 0x72C400;
-			opSongAddress = boostAddress + 0x2450C8;
-			opDiffAddress = boostAddress + 0x1696AA;
-			opInSongAddress = boostAddress + 0x26812F;
-			opInSongAddress2 = boostAddress + 0x268138;
-			bullshitAddress = boostAddress + 0x112963;
-			extidAddress = (intptr_t)chun + 0x39BA34;
-			clearingAddress = boostAddress + 0x1D4457;
-			clearingAddress2 = boostAddress + 0x1D2F0A;
-			testmenuAddress = boostAddress2 + 0x1466DB;
-			testmenuAddress2 = boostAddress2 + 0x1433E8;
-			clearBarsAddress = boostAddress + 0x11387B;
-		}
-		else if (gameversion == "amazonplus") {
-			baseAddress = (intptr_t)chun + 0xC00;
-			boostAddress = (intptr_t)chun + 0x472FD0;
-			boostAddress2 = (intptr_t)chun + 0x74F6B0;
-			opSongAddress = boostAddress + 0x25C478;
-			opDiffAddress = boostAddress + 0x17A0EA;
-			opInSongAddress = boostAddress + 0x27F35F;
-			opInSongAddress2 = boostAddress + 0x27F368;
-			bullshitAddress = boostAddress + 0x116C13;
-			extidAddress = (intptr_t)chun + 0x3A5454;
-			clearingAddress = boostAddress + 0x1E6CD7;
-			clearingAddress2 = boostAddress + 0x1E557A;
-			testmenuAddress = boostAddress2 + 0x14662B;
-			testmenuAddress2 = boostAddress2 + 0x143338;
-			clearBarsAddress = boostAddress + 0x117B2B;
-		}
-		else if (gameversion == "crystal") {
-			baseAddress = (intptr_t)chun + 0xC00;
-			boostAddress = (intptr_t)chun + 0x48B2D0;
-			boostAddress2 = (intptr_t)chun + 0x775830;
-			opSongAddress = boostAddress + 0x2695A8;
-			opDiffAddress = boostAddress + 0x17EC1A;
-			opInSongAddress = boostAddress + 0x28D04F;
-			opInSongAddress2 = boostAddress + 0x28D058;
-			bullshitAddress = boostAddress + 0x11B3A3;
-			extidAddress = (intptr_t)chun + 0x3AF664;
-			clearingAddress = boostAddress + 0x1F023D;
-			clearingAddress2 = boostAddress + 0x1EEA0A;
-			testmenuAddress = boostAddress2 + 0x14662B;
-			testmenuAddress2 = boostAddress2 + 0x143338;
-			clearBarsAddress = boostAddress + 0x11C335;
-		}
-		else if (gameversion == "paradise" or gameversion == "paradiselost") {
+		if (gameversion == "paradise" or gameversion == "paradiselost") {
 			baseAddress = (intptr_t)chun + 0xC00;
 			boostAddress = (intptr_t)chun + 0x0;
 			boostAddress2 = (intptr_t)chun + 0x0;
 			opSongAddress = boostAddress + 0x72B098;
 			opDiffAddress = boostAddress + 0x63D06A;
+			opDiffAddress2 = boostAddress + 0x64D43E;
 			opInSongAddress = boostAddress + 0x74F2AF;
 			opInSongAddress2 = boostAddress + 0x74F2B8;
 			bullshitAddress = boostAddress + 0x5D6CD3;
@@ -563,7 +526,7 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 			clearBarsAddress = boostAddress + 0x5D7C65;
 		}
 		else {
-			cout << "[ChunItachi] Game version is unsupported, compatability needs to be added, currently supports [amazon,amazonplus,crystal]" << endl;
+			cout << "[ChunItachi] Game version is unsupported, compatability needs to be added, currently supports [paradise,paradiselost]" << endl;
 			system("pause");
 			return FALSE;
 		}
@@ -576,6 +539,10 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 		if (debug) { printf("[ChunItachi] Detouring Difficulty ID\n"); }
 		jmpBackAddy2 = opDiffAddress + hookLength;
 		HOOK((void*)opDiffAddress, diffDetour, hookLength);
+		//detour diff id2
+		if (debug) { printf("[ChunItachi] Detouring Difficulty ID 2\n"); }
+		jmpBackAddy13 = opDiffAddress2 + hookLength;
+		HOOK((void*)opDiffAddress2, diffDetour2, hookLength);
 		//detour in song
 		if (debug) { printf("[ChunItachi] Detouring InSong\n"); }
 		jmpBackAddy3 = opInSongAddress + hookLength;

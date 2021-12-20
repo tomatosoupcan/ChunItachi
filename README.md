@@ -1,6 +1,6 @@
 # ChunItachi
 
-ChunItachi is an injectable dll for Chunithm Amazon/AmazonPlus/Crystal/Paradise/ParadiseLost which enables [KamaItachi](https://kamaitachi.xyz) uploads as you play
+ChunItachi is an injectable dll for Chunithm Paradise/ParadiseLost which enables [KamaItachi](https://kamaitachi.xyz) uploads as you play
 
 ## Installation & Usage
 

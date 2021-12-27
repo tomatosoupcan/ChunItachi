@@ -371,7 +371,7 @@ DWORD WINAPI threadMain(LPVOID lpParam) {
 														{"score", songScore},
 														{"lamp", songLamp},
 														{"matchType", "inGameID"},
-														{"identifier", curSong},
+														{"identifier", to_string(curSong)},
 														{"difficulty", dif2String},
 														{"timeAchieved", duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count()},
 														{"judgements",

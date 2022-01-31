@@ -328,96 +328,98 @@ DWORD WINAPI threadMain(LPVOID lpParam) {
 			//give the game a second or two to think, this should also help avoid accidental sends when returning
 			//to test menu after I fix that shit
 			Sleep(2000);
-			releaseTag = releaseTag.substr(3,10);
+			releaseTag = releaseTag.substr(3, 10);
 			//Verify we are sending data from a real genre category, avoid customs, verify the user is the user defined in the config
-			if ((extid == extidload or extidload == 0 or extid == 0) and testmenu == 0 and (releaseTag == "1.00.00" or releaseTag == "1.05.00" or releaseTag == "1.10.00" or releaseTag == "1.15.00" or releaseTag == "1.20.00" or releaseTag == "1.25.00" or releaseTag == "1.30.00" or releaseTag == "1.35.00" or releaseTag == "1.40.00" or releaseTag == "1.45.00" or releaseTag == "1.50.00" or releaseTag == "1.55.00")) {
-				if (genreID == "0" or genreID == "99" or genreID == "2" or genreID == "3" or genreID == "6" or genreID == "1" or genreID == "7" or genreID == "8" or genreID == "9" or genreID == "5" or genreID == "10") {
-					if (dif2String != "WORLD'S END" and dif2String != "TUTORIAL" and dif2String != "ERROR") {
-						//calculate lamp
-						if (songBars < targetBars/100 and failOverLamp) {
-							songLamp = "FAILED";
-						}
-						else if (songMiss == 0 and songAttack == 0 and songJustice == 0) {
-							songLamp = "ALL JUSTICE CRITICAL";
-						}
-						else if (songMiss == 0 and songAttack == 0) {
-							songLamp = "ALL JUSTICE";
-						}
-						else if (songMiss == 0) {
-							songLamp = "FULL COMBO";
-						}
-						else if (songBars < targetBars / 100) {
-							songLamp = "FAILED";
-						}
-						else {
-							songLamp = "CLEAR";
-						}
-						//pull the values
-						printf("[ChunItachi] Uploading play to KamaItachi:\n");
-						//actually send the data here
-						
-						json outData = {
-											{"meta", 
-												{
-													{"service", "ChunItachi"},
-													{"game", "chunithm"},
-													{"playtype", "Single"},
-													{"version", gameversion}
-												}
-											},
-											{"scores", 
-												{
+			if (inSong == 0) {
+				if ((extid == extidload or extidload == 0 or extid == 0) and testmenu == 0 and (releaseTag == "1.00.00" or releaseTag == "1.05.00" or releaseTag == "1.10.00" or releaseTag == "1.15.00" or releaseTag == "1.20.00" or releaseTag == "1.25.00" or releaseTag == "1.30.00" or releaseTag == "1.35.00" or releaseTag == "1.40.00" or releaseTag == "1.45.00" or releaseTag == "1.50.00" or releaseTag == "1.55.00")) {
+					if (genreID == "0" or genreID == "99" or genreID == "2" or genreID == "3" or genreID == "6" or genreID == "1" or genreID == "7" or genreID == "8" or genreID == "9" or genreID == "5" or genreID == "10") {
+						if (dif2String != "WORLD'S END" and dif2String != "TUTORIAL" and dif2String != "ERROR") {
+							//calculate lamp
+							if (songBars < targetBars / 100 and failOverLamp) {
+								songLamp = "FAILED";
+							}
+							else if (songMiss == 0 and songAttack == 0 and songJustice == 0) {
+								songLamp = "ALL JUSTICE CRITICAL";
+							}
+							else if (songMiss == 0 and songAttack == 0) {
+								songLamp = "ALL JUSTICE";
+							}
+							else if (songMiss == 0) {
+								songLamp = "FULL COMBO";
+							}
+							else if (songBars < targetBars / 100) {
+								songLamp = "FAILED";
+							}
+							else {
+								songLamp = "CLEAR";
+							}
+							//pull the values
+							printf("[ChunItachi] Uploading play to KamaItachi:\n");
+							//actually send the data here
+
+							json outData = {
+												{"meta",
 													{
-														{"score", songScore},
-														{"lamp", songLamp},
-														{"matchType", "inGameID"},
-														{"identifier", to_string(curSong)},
-														{"difficulty", dif2String},
-														{"timeAchieved", duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count()},
-														{"judgements",
-															{
-																{"miss",songMiss},
-																{"attack",songAttack},
-																{"justice",songJustice},
-																{"jcrit",songCrit}
+														{"service", "ChunItachi"},
+														{"game", "chunithm"},
+														{"playtype", "Single"},
+														{"version", gameversion}
+													}
+												},
+												{"scores",
+													{
+														{
+															{"score", songScore},
+															{"lamp", songLamp},
+															{"matchType", "inGameID"},
+															{"identifier", to_string(curSong)},
+															{"difficulty", dif2String},
+															{"timeAchieved", duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count()},
+															{"judgements",
+																{
+																	{"miss",songMiss},
+																	{"attack",songAttack},
+																	{"justice",songJustice},
+																	{"jcrit",songCrit}
+																}
 															}
 														}
 													}
 												}
-											}
-										};
-						//curl out
-						/*json jsonBody = {
-							{"importData", outData.dump()},
-							{"serviceLoc", "DIRECT-MANUAL"},
-							{"gameLoc", "chunithm"},
-							{"noNotif", true},
-						};*/
-						cout << "[ChunItachi] Sending Data" << endl;
-						cpr::Response r = cpr::Post(cpr::Url{ apiEndpoint },
-							cpr::Timeout(4 * 1000),
-							cpr::Header{ {"Authorization","Bearer " + apikey}, {"Content-Type", "application/json"} },
-							//cpr::Body{ jsonBody.dump() });
-							cpr::Body{ outData.dump() });
-						cout << outData.dump() << endl;
-						
-						cout << "[ChunItachi] Sent, response code: " << r.status_code << endl;
-						cout << "[ChunItachi] Response text: " << r.text << endl;
-						//cout << r.text << endl;
-						
-						
+							};
+							//curl out
+							/*json jsonBody = {
+								{"importData", outData.dump()},
+								{"serviceLoc", "DIRECT-MANUAL"},
+								{"gameLoc", "chunithm"},
+								{"noNotif", true},
+							};*/
+							cout << "[ChunItachi] Sending Data" << endl;
+							cpr::Response r = cpr::Post(cpr::Url{ apiEndpoint },
+								cpr::Timeout(4 * 1000),
+								cpr::Header{ {"Authorization","Bearer " + apikey}, {"Content-Type", "application/json"} },
+								//cpr::Body{ jsonBody.dump() });
+								cpr::Body{ outData.dump() });
+							cout << outData.dump() << endl;
+
+							cout << "[ChunItachi] Sent, response code: " << r.status_code << endl;
+							cout << "[ChunItachi] Response text: " << r.text << endl;
+							//cout << r.text << endl;
+
+
+						}
+						else {
+							cout << "[ChunItachi] Not a valid diff: " << dif2String << "\n";
+						}
 					}
 					else {
-						cout << "[ChunItachi] Not a valid diff: " << dif2String << "\n";
+						cout << "[ChunItachi] Not a valid genre: " << genreID << "\n";
 					}
 				}
 				else {
-					cout << "[ChunItachi] Not a valid genre: " << genreID << "\n";
+					cout << "[ChunItachi] Non matching extid: " << extid << " versus " << extidload << "?\n";
+					cout << "[ChunItachi] Test menu flag: " << testmenu << " Release Tag: " << releaseTag << "?\n";
 				}
-			}
-			else {
-				cout << "[ChunItachi] Non matching extid: " << extid << " versus " << extidload << "?\n";
-				cout << "[ChunItachi] Test menu flag: " << testmenu << " Release Tag: " << releaseTag << "?\n";
 			}
 		}
 
